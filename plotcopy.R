@@ -2,6 +2,9 @@ library(tidyverse)
 
 # Build dummy data --------------------------------------------------------
 
+# comment.. all this down to plot, should be possible to split on country etc. 
+# So for each run we get the cross df (to place the cross on plot)
+
 df <- data_frame(country = c(rep("SE", 10), rep("NO", 10)),
                  importance = runif(20, 0, 1),
                  performance = runif(20, .3, .9),
@@ -16,14 +19,24 @@ df <- df %>%
     mutate(colorgroup = case_when(importance < 0.5 & performance < 0.5 ~ "ll",
                                   importance < 0.5 & performance > 0.5 ~ "ul",
                                   importance > 0.5 & performance < 0.5 ~ "lr",
-                                  importance > 0.5 & performance > 0.5 ~ "ur"))
+                                  importance > 0.5 & performance > 0.5 ~ "ur")) %>% 
+                                  {.}
+
+# Make df for cross placement on plot -------------------------------------
+
+cross <- df %>% 
+    summarise(xmin = mean(importance, na.rm = TRUE) - 0.015,
+              xmax = xmin + 0.023, # yikes... dunno if this will make cross x as thick as y?
+              ymin = mean(performance, na.rm = TRUE) * 100 - 2,
+              ymax = ymin +4)
 
 
 # Try to mimic Timmys plot ------------------------------------------------
 
-ggplot(df, aes(x = importance, y = performance * 100, color = colorgroup)) + geom_point() +
-    geom_text(aes(x = importance, y = performance * 100, label = itemtext, color = colorgroup), 
-                  vjust = -.8) +
+ggplot() +
+    geom_point(data = df, aes(x = importance, y = performance * 100, color = colorgroup)) +
+    geom_text(data = df, aes(x = importance, y = performance * 100, 
+                             label = itemtext, color = colorgroup), vjust = -.8) +
     guides(color = FALSE) +
     theme_minimal() +
     theme(plot.margin = unit(c(1,1,1,1), "cm"),
@@ -44,14 +57,12 @@ ggplot(df, aes(x = importance, y = performance * 100, color = colorgroup)) + geo
           legend.text = element_text(color="#2e6e9c", size="10")) +
     scale_x_continuous(limits = c(0,1)) +
     scale_y_continuous(limits = c(0,100)) +
-    xlab(label = "IMPORTANCE (IMPACT ON OVERALL STORE SATISFACTION)") +
-    ylab(label = "PERFORMANCE (% SCORE 4-5)") +
+    xlab(label = "") + # Timmy don't want labels....
+    ylab(label = "") +
     annotate(geom = "text", x = 0.02, y = 2, label = "Low importance", 
              color = "#4c7a9f", size = 3, fontface = "italic", hjust = 0) +
     annotate(geom = "text", x = 0.98, y = 2, label = "High importance", 
              color = "#4c7a9f", size = 3, fontface = "italic", hjust = 1) +
-    annotate("segment", x=-Inf, xend = Inf, y = 0, yend = 0, arrow = arrow(), color = "grey")+
-    # scale_y_continuous(limits=c(-0.5, 1)) +
-    geom_rect(mapping=aes(xmin=0.49, xmax=0.51, ymin=0, ymax=100), color = NA, fill = "grey98", alpha=0.01) +
-    geom_rect(mapping=aes(xmin=0, xmax=1, ymin=48, ymax=52), color = NA, fill = "grey90", alpha=0.01)
-
+    annotate("segment", x=-Inf, xend = Inf, y = 0, yend = 0, arrow = arrow(), color = "grey") +
+    geom_rect(data = cross, mapping=aes(xmin=xmin, xmax=xmax, ymin=0, ymax=100), color = NA, fill = "grey70", alpha=0.3) +
+    geom_rect(data = cross, mapping=aes(xmin=0, xmax=1, ymin=ymin, ymax=ymax), color = NA, fill = "grey70", alpha=0.3)
