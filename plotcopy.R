@@ -13,29 +13,34 @@ df <- data_frame(country = c(rep("SE", 10), rep("NO", 10)),
                               'statement9','statement10'),2))
 
 
-# Add colorgroup on perf/imp ----------------------------------------------
-
-df <- df %>% 
-    mutate(colorgroup = case_when(importance < 0.5 & performance < 0.5 ~ "ll",
-                                  importance < 0.5 & performance > 0.5 ~ "ul",
-                                  importance > 0.5 & performance < 0.5 ~ "lr",
-                                  importance > 0.5 & performance > 0.5 ~ "ur")) %>% 
-                                  {.}
 
 # Make df for cross placement on plot -------------------------------------
 
 cross <- df %>% 
-    summarise(xmin = mean(importance, na.rm = TRUE) - 0.015,
+    summarise(xmean = mean(importance, na.rm = TRUE),
+              ymean = mean(performance, na.rm = TRUE),
+              xmin = mean(importance, na.rm = TRUE) - 0.015,
               xmax = xmin + 0.023, # yikes... dunno if this will make cross x as thick as y?
               ymin = mean(performance, na.rm = TRUE) * 100 - 2,
               ymax = ymin +4)
 
 
+
+# Add colorgroup on perf/imp ----------------------------------------------
+
+pdata <- df %>% 
+    cbind(., cross) %>% # get values from cross duplicated to make colorgroup
+    mutate(colorgroup = case_when(importance < xmean & performance < ymean ~ "ll",
+                                  importance < xmean & performance > ymean ~ "ul",
+                                  importance > xmean & performance < ymean ~ "lr",
+                                  importance > xmean & performance > ymean ~ "ur")) %>% 
+    filter(country == "SE")
+
 # Try to mimic Timmys plot ------------------------------------------------
 
 ggplot() +
-    geom_point(data = df, aes(x = importance, y = performance * 100, color = colorgroup)) +
-    geom_text(data = df, aes(x = importance, y = performance * 100, 
+    geom_point(data = pdata, aes(x = importance, y = performance * 100, color = colorgroup)) +
+    geom_text(data = pdata, aes(x = importance, y = performance * 100, 
                              label = itemtext, color = colorgroup), vjust = -.8) +
     guides(color = FALSE) +
     theme_minimal() +
@@ -64,5 +69,7 @@ ggplot() +
     annotate(geom = "text", x = 0.98, y = 2, label = "High importance", 
              color = "#4c7a9f", size = 3, fontface = "italic", hjust = 1) +
     annotate("segment", x=-Inf, xend = Inf, y = 0, yend = 0, arrow = arrow(), color = "grey") +
-    geom_rect(data = cross, mapping=aes(xmin=xmin, xmax=xmax, ymin=0, ymax=100), color = NA, fill = "grey70", alpha=0.3) +
-    geom_rect(data = cross, mapping=aes(xmin=0, xmax=1, ymin=ymin, ymax=ymax), color = NA, fill = "grey70", alpha=0.3)
+    # geom_rect(data = cross, mapping=aes(xmin=xmin, xmax=xmax, ymin=0, ymax=100), color = NA, fill = "grey70", alpha=0.3) +
+    # geom_rect(data = cross, mapping=aes(xmin=0, xmax=1, ymin=ymin, ymax=ymax), color = NA, fill = "grey70", alpha=0.3) +
+    geom_vline(data = cross, aes(xintercept = xmean)) +
+    geom_hline(data = cross, aes(yintercept = ymean * 100))
