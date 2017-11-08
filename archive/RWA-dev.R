@@ -14,8 +14,6 @@ data <- r %>%
 
 
 
-
-
 # rwa_function, returns list of 3 -----------------------------------------
 
 rwa <- function(data, dep_var, split_var = NULL, weight_var = NULL) {
@@ -34,11 +32,22 @@ rwa <- function(data, dep_var, split_var = NULL, weight_var = NULL) {
     driver = matrix(NA, ncol=length(2:ncol(l[[1]]))-1, nrow=length(l)) #creates an empty matrix for drivers
     r2 = matrix(NA, ncol=length(2:ncol(l[[1]]))-1, nrow=length(l)) #creates an empty matrix for drivers
 
+    # here we should have a check on whether weight_var is given, else run 
+    # cor, driver, r2 without weight
+    
+    # if (length(weigh_var > 0) {
+    
     for(i in 1:length(l)){
         corr[i,] = wtd.cors(l[[i]][, dep_var], l[[i]][,2:ncol(l[[i]])-1], weight=l[[i]][, weight_var])
         driver[i,] =  calc.relimp(l[[i]][,1:ncol(l[[i]])-1], weights = l[[i]][, weight_var], type = "genizi", rank = FALSE, rela = TRUE)@genizi
         r2[i,] = calc.relimp(l[[i]][,1:ncol(l[[i]])-1], weights = l[[i]][, weight_var], type = "genizi", rank = FALSE, rela = FALSE)@genizi
     }
+    # } else { # do unweighted run below....
+    # for(i in 1:length(l)){
+    #     corr[i,] = wtd.cors(l[[i]][, dep_var], l[[i]][,2:ncol(l[[i]])-1], weight=l[[i]][, weight_var])
+    #     driver[i,] =  calc.relimp(l[[i]][,1:ncol(l[[i]])-1], weights = l[[i]][, weight_var], type = "genizi", rank = FALSE, rela = TRUE)@genizi
+    #     r2[i,] = calc.relimp(l[[i]][,1:ncol(l[[i]])-1], weights = l[[i]][, weight_var], type = "genizi", rank = FALSE, rela = FALSE)@genizi
+    # }
 
     colnames(driver) = names(l[[1]][3:length(l[[i]])-1])
     colnames(r2) = names(l[[1]][3:length(l[[i]])-1])
@@ -55,13 +64,11 @@ rwa <- function(data, dep_var, split_var = NULL, weight_var = NULL) {
     
     } else {
         
-        return("No Splits")
+        return(print("No Splits"))
     }
     
 
 }
 
 # test it
-test <- rwa(data, dep_var = "q9_tot", split_var = "d0", weight_var = "wt")
-
-corr <- as.data.frame(test[3])
+test <- rwa(data, dep_var = "q9_tot", weight_var = "wt")
