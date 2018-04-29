@@ -1,53 +1,116 @@
+
+# needed functions
 library(relaimpo)
+
+f_topbox <- function(formula, data, tb_limit){
+    # Select vars
+    form <- strsplit(x = formula, split = "~")
+    vars <- trimws(strsplit(form[[1]][2], split = "\\+")[[1]], which = "both")
+    sub_data <- subset(data, select = vars)
+    
+    d <- apply(sub_data, 2, function(x){ifelse(x >= tb_limit, 1, 0)})
+    return(apply(d, 2, function(x){sum(x, na.rm = TRUE)/length(x)}))
+}
+
+#f_topbox(formula = formula, rwadata, tb_limit = 1)
 
 load("rwadata.rda")
 
-rwa <- function(formula, data, split_var){
+rwa <- function(formula, data, split_var, weights, tb_limit){
     # Store results
     res <- list()
+    tb <- list()
     j <- 1
-   
-    # Total
-    res[[j]] <- calc.relimp(
-        eval(parse(text = formula)),
-        type = "genizi",
-        rank = FALSE,
-        rela = TRUE,
-        data = data,
-        weights = data$weight)@genizi
     
-    # Per split
     # Tibbles in tidyverse forces unique to tibble if package is loaded
     # Therefore this ugly work around
     if("tibble" %in% .packages()){
+        # IF TIBBLE IS LOADED
+        # Total
+        res[[j]] <- calc.relimp(
+            eval(parse(text = formula)),
+            type = "genizi",
+            rank = FALSE,
+            rela = TRUE,
+            data = data,
+            weights = as_vector(data[,weights]))@genizi
+        
+        tb[[j]] <- f_topbox(formula = formula, data = data, tb_limit = tb_limit)
+        
         uniq <- as_vector(unique(data[,split_var]))
-    } else{
-        uniq <- as.vector(unique(data[,split_var]))
-        }
-    
-    for(i in 1:length(uniq)) {
-            df <- subset(data, data[, split_var] == uniq[i])
+        
+        # Per split
+        for(i in 1:length(uniq)) {
+            sub_df <- subset(data, data[, split_var] == uniq[i])
             res[[j+1]] <- calc.relimp(
                 eval(parse(text = formula)),
                 type = "genizi",
                 rank = FALSE,
                 rela = TRUE,
-                data = df,
-                weights = df$weight)@genizi
+                data = sub_df,
+                weights = as_vector(sub_df[,weights]))@genizi
+            
+            tb[[j+1]] <- f_topbox(formula = formula, data = sub_df, tb_limit = tb_limit)
+            
             j <- j + 1
-            }
+        }
+    } else{
+        # IF TIBBLE IS NOT LOADED
+        # Total
+        res[[j]] <- calc.relimp(
+            eval(parse(text = formula)),
+            type = "genizi",
+            rank = FALSE,
+            rela = TRUE,
+            data = data,
+            weights = as.vector(data[,weights]))@genizi
+        
+        tb[[j]] <- f_topbox(formula = formula, data = data, tb_limit = tb_limit)
+        
+        uniq <- as.vector(unique(data[,split_var]))
+        
+        # Per split
+        for(i in 1:length(uniq)) {
+            sub_df <- subset(data, data[, split_var] == uniq[i])
+            res[[j+1]] <- calc.relimp(
+                eval(parse(text = formula)),
+                type = "genizi",
+                rank = FALSE,
+                rela = TRUE,
+                data = sub_df,
+                weights = as.vector(sub_df[,weights]))@genizi
+            
+            tb[[j+1]] <- f_topbox(formula = formula, data = sub_df, tb_limit = tb_limit)
+            
+            j <- j + 1
+        }
+        }
     
     # Insert result in data frame
     rwa_output <- NULL
+    tb_output <- NULL
     for (k in 1:length(res)) {
         rwa_output <- as.data.frame(cbind(rwa_output, res[[k]]))
+        tb_output <- as.data.frame(cbind(tb_output, tb[[k]]))
     }
     
     colnames(rwa_output) <- append("Total", uniq)
-    return(rwa_output)
+    colnames(tb_output) <- append("Total", uniq)
+    return(list(rwa = rwa_output,
+                topbox = tb_output))
 }
 
-form <- "dependant ~ q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8 + q9 + q10 + q11 + q12 + q13 + q14 + q15"
-rwa(form, data = rwadata, split_var = "splitter")
+formula <- "dependant ~ q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8 + q9 + q10 + q11 + q12 + q13 + q14 + q15"
+rwa(formula, data = rwadata, split_var = "splitter", weight = "weight", tb_limit = 1)
 
+
+idx <- sample(1:19039, 1000, replace = FALSE)
+df <- rwadata[idx,]
+table(df$splitter)
+
+library(tidyverse)
+df2 <- rename(df, hej = weight)
+
+w_weight <- rwa(formula, df, "splitter", weights = "weight", tb_limit = 1)
+w_hej <- rwa(formula, df2, "splitter", weights = "hej", tb_limit = 1)
 
