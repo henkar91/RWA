@@ -66,17 +66,17 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
     
     colnames(rwa_output) <- append("Total", uniq)
     colnames(tb_output) <- append("Total", uniq)
+    
     return(list(rwa = rwa_output,
                 topbox = tb_output))
 }
 
 formula <- "dependant ~ q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8 + q9 + q10 + q11 + q12 + q13 + q14 + q15"
-rwa(formula, data = rwadata, split_var = "splitter", weight = "weight", tb_limit = 1)
 
-df <- readRDS(file = "rwaclean.rds")
+# test total with split and weight
+total_split <- rwa(formula, data = rwadata, split_var = "splitter", weight = "weight", tb_limit = 1)
 
-library(tidyverse)
-total <- rwa(formula, df, weights = "weight", tb_limit = 1)
-split <- rwa(formula, df, "splitter", weights = "weight", tb_limit = 1)
+# Test total without split and weight
+total <- rwa(formula, data = rwadata, weight = "weight", tb_limit = 1)
 
 
