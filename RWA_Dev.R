@@ -16,9 +16,6 @@ f_topbox <- function(formula, data, weights, tb_limit){
     return(apply(d, 2, function(x){sum(x, na.rm = TRUE)/length(x)}))
 }
 
-# test <- f_topbox(formula = formula, rwadata, "weight", tb_limit = 1)
-
-#load("rwadata.rda")
 
 rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
     data <- as.data.frame(data)
@@ -74,26 +71,33 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
                 topbox = tb_output))
 }
 
-formula <- "dependant ~ q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8 + q9 + q10 + q11 + q12 + q13 + q14 + q15"
+# load("rwadata.rda")
+# formula <- "dependant ~ q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8 + q9 + q10 + q11 + q12 + q13 + q14 + q15"
 
 # test total with split and weight
-total_split <- rwa(formula, data = rwadata, split_var = "splitter", weight = "weight", tb_limit = 1)
+total_split <- rwa(formula, data = rwadata, split_var = "splitter", weights = "weight", tb_limit = 1)
 
 # Test total without split and weight
 total <- rwa(formula, data = rwadata, weight = "weight", tb_limit = 1)
 
-library(tidyverse)
-it <- rwadata %>%
-    filter(splitter == "ITALY")
-fr <- rwadata %>%
-    filter(splitter == "FRANCE")
-uk <- rwadata %>%
-    filter(splitter == "UNITED KINGDOM")
 
-idx <- sample(1:4180, 250)
+df <- data.frame(dependant = sample(1:7, 200, replace = TRUE),
+                 q1 = sample(1:5, 200, replace = TRUE),
+                 q2 = sample(1:5, 200, replace = TRUE),
+                 q3 = sample(1:5, 200, replace = TRUE),
+                 q4 = sample(1:5, 200, replace = TRUE),
+                 q5 = sample(1:5, 200, replace = TRUE),
+                 q6 = sample(1:5, 200, replace = TRUE),
+                 q7 = sample(1:5, 200, replace = TRUE),
+                 q8 = sample(1:5, 200, replace = TRUE),
+                 q9 = sample(1:5, 200, replace = TRUE),
+                 weight = runif(n = 200, min = .5, max = 2.5),
+                 split = c(rep("SE", 50),
+                           rep("NO", 50),
+                           rep("DK", 50),
+                           rep("FI", 50)))
 
-df<- rbind(it[idx,], fr[idx,], uk[idx,])
+save(df, file = "rwa/data/exdata.rda")
 
-save(df, file ="data.Rda")
-
-rwa(formula = formula, data = df, split_var = "splitter", weights = "weight", tb_limit = 1)
+form <- c("dependant ~ q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8 +q9")
+total_split <- rwa(form, data = df, split_var = "split", weights = "weight", tb_limit = 4)
