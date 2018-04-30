@@ -14,48 +14,15 @@ f_topbox <- function(formula, data, tb_limit){
 
 #f_topbox(formula = formula, rwadata, tb_limit = 1)
 
-load("rwadata.rda")
+#load("rwadata.rda")
 
-rwa <- function(formula, data, split_var, weights, tb_limit){
+rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
+    data <- as.data.frame(data)
     # Store results
     res <- list()
     tb <- list()
     j <- 1
     
-    # Tibbles in tidyverse forces unique to tibble if package is loaded
-    # Therefore this ugly work around
-    if("tibble" %in% .packages()){
-        # IF TIBBLE IS LOADED
-        # Total
-        res[[j]] <- calc.relimp(
-            eval(parse(text = formula)),
-            type = "genizi",
-            rank = FALSE,
-            rela = TRUE,
-            data = data,
-            weights = as_vector(data[,weights]))@genizi
-        
-        tb[[j]] <- f_topbox(formula = formula, data = data, tb_limit = tb_limit)
-        
-        uniq <- as_vector(unique(data[,split_var]))
-        
-        # Per split
-        for(i in 1:length(uniq)) {
-            sub_df <- subset(data, data[, split_var] == uniq[i])
-            res[[j+1]] <- calc.relimp(
-                eval(parse(text = formula)),
-                type = "genizi",
-                rank = FALSE,
-                rela = TRUE,
-                data = sub_df,
-                weights = as_vector(sub_df[,weights]))@genizi
-            
-            tb[[j+1]] <- f_topbox(formula = formula, data = sub_df, tb_limit = tb_limit)
-            
-            j <- j + 1
-        }
-    } else{
-        # IF TIBBLE IS NOT LOADED
         # Total
         res[[j]] <- calc.relimp(
             eval(parse(text = formula)),
@@ -69,22 +36,25 @@ rwa <- function(formula, data, split_var, weights, tb_limit){
         
         uniq <- as.vector(unique(data[,split_var]))
         
-        # Per split
-        for(i in 1:length(uniq)) {
-            sub_df <- subset(data, data[, split_var] == uniq[i])
-            res[[j+1]] <- calc.relimp(
-                eval(parse(text = formula)),
-                type = "genizi",
-                rank = FALSE,
-                rela = TRUE,
-                data = sub_df,
-                weights = as.vector(sub_df[,weights]))@genizi
-            
-            tb[[j+1]] <- f_topbox(formula = formula, data = sub_df, tb_limit = tb_limit)
-            
-            j <- j + 1
+        # If function for splitting
+        if(split_var != FALSE){
+            # Per split
+            for(i in 1:length(uniq)) {
+                sub_df <- subset(data, data[, split_var] == uniq[i])
+                res[[j+1]] <- calc.relimp(
+                    eval(parse(text = formula)),
+                    type = "genizi",
+                    rank = FALSE,
+                    rela = TRUE,
+                    data = sub_df,
+                    weights = as.vector(sub_df[,weights]))@genizi
+                
+                tb[[j+1]] <- f_topbox(formula = formula, data = sub_df, tb_limit = tb_limit)
+                
+                j <- j + 1
+            }
         }
-        }
+    #}
     
     # Insert result in data frame
     rwa_output <- NULL
@@ -103,14 +73,10 @@ rwa <- function(formula, data, split_var, weights, tb_limit){
 formula <- "dependant ~ q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8 + q9 + q10 + q11 + q12 + q13 + q14 + q15"
 rwa(formula, data = rwadata, split_var = "splitter", weight = "weight", tb_limit = 1)
 
-
-idx <- sample(1:19039, 1000, replace = FALSE)
-df <- rwadata[idx,]
-table(df$splitter)
+df <- readRDS(file = "rwaclean.rds")
 
 library(tidyverse)
-df2 <- rename(df, hej = weight)
+total <- rwa(formula, df, weights = "weight", tb_limit = 1)
+split <- rwa(formula, df, "splitter", weights = "weight", tb_limit = 1)
 
-w_weight <- rwa(formula, df, "splitter", weights = "weight", tb_limit = 1)
-w_hej <- rwa(formula, df2, "splitter", weights = "hej", tb_limit = 1)
 
