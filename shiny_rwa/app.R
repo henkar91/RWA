@@ -5,11 +5,18 @@ library(shiny)
 ui <- fluidPage(
    
    fluidRow(
-     column(3),
+     column(3,
+            fileInput("infile",
+                      label = "upload data", 
+                      accept = c(".sav", ".xlsx", ".csv")),
+            selectInput("indep", "Select Dependant", choices = "Pending Upload"),
+            selectInput("inmeasure", "Select Other Vars", choices = "Pending Upload"),
+            selectInput("inweight", "Select Weight", choices = "Pending Upload")
+     ),
      column(6,
             div(align = "center",
             p("RWA", style = "font-size: 76pt; color: #99ffaa"),
-            tableOutput("tbl"),
+            tableOutput("contents"),
      column(3))
      )
    )
@@ -17,13 +24,24 @@ ui <- fluidPage(
 
 
 # Server
-server <- function(input, output) {
+server <- function(input, output, session) {
    
-   output$tbl <- renderTable({
-    data(iris)
-    head(iris)
-        })
-}
+  contentsrea <- reactive({
+    inFile <- input$infile
+    if (is.null(inFile))
+      return(NULL)
+    read.csv(inFile$datapath)
+    
+    
+  })
+  output$contents<-renderTable({contentsrea()})
+    
+  observe({
+    updateSelectInput(session, "indep", choices = names(contentsrea()))
+    updateSelectInput(session, "inmeasure", choices = names(contentsrea()))
+    updateSelectInput(session, "inweight", choices = names(contentsrea()))
+  })
+} 
 
 # Run the application 
 shinyApp(ui = ui, server = server)
