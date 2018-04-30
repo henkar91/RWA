@@ -82,4 +82,18 @@ total_split <- rwa(formula, data = rwadata, split_var = "splitter", weight = "we
 # Test total without split and weight
 total <- rwa(formula, data = rwadata, weight = "weight", tb_limit = 1)
 
+library(tidyverse)
+it <- rwadata %>%
+    filter(splitter == "ITALY")
+fr <- rwadata %>%
+    filter(splitter == "FRANCE")
+uk <- rwadata %>%
+    filter(splitter == "UNITED KINGDOM")
 
+idx <- sample(1:4180, 250)
+
+df<- rbind(it[idx,], fr[idx,], uk[idx,])
+
+save(df, file ="data.Rda")
+
+rwa(formula = formula, data = df, split_var = "splitter", weights = "weight", tb_limit = 1)

@@ -13,7 +13,7 @@
 The DESCRIPTION file:
 \packageDESCRIPTION{rwa}
 \packageIndices{rwa}
-~~ An overview of how to use the package, including the most important functions ~~
+
 }
 \author{
 \packageAuthor{rwa}
@@ -21,14 +21,13 @@ The DESCRIPTION file:
 Maintainer: \packageMaintainer{rwa}
 }
 \references{
-~~ Literature or other references for background information ~~
+http://core.ecu.edu/psyc/wuenschk/MV/multReg/Relative_Weights_Analysis.pdf
 }
-~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation directory ~~
+
 \keyword{ package }
 \seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
+
 }
 \examples{
-~~ simple examples of the most important functions ~~
+rwa(formula = formula, data = df, split_var = "splitter", weights = "weight", tb_limit = 1)
 }
