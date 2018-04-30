@@ -2,17 +2,21 @@
 # needed functions
 library(relaimpo)
 
-f_topbox <- function(formula, data, tb_limit){
+f_topbox <- function(formula, data, weights, tb_limit){
+    w <- data[,weights]
+    
     # Select vars
     form <- strsplit(x = formula, split = "~")
     vars <- trimws(strsplit(form[[1]][2], split = "\\+")[[1]], which = "both")
     sub_data <- subset(data, select = vars)
     
-    d <- apply(sub_data, 2, function(x){ifelse(x >= tb_limit, 1, 0)})
+    d <- apply(sub_data, 2, function(x){
+        ifelse(x >= tb_limit, 1, 0) * w
+        })
     return(apply(d, 2, function(x){sum(x, na.rm = TRUE)/length(x)}))
 }
 
-#f_topbox(formula = formula, rwadata, tb_limit = 1)
+# test <- f_topbox(formula = formula, rwadata, "weight", tb_limit = 1)
 
 #load("rwadata.rda")
 
@@ -32,7 +36,7 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
             data = data,
             weights = as.vector(data[,weights]))@genizi
         
-        tb[[j]] <- f_topbox(formula = formula, data = data, tb_limit = tb_limit)
+        tb[[j]] <- f_topbox(formula = formula, data = data, weights = weights, tb_limit = tb_limit)
         
         uniq <- as.vector(unique(data[,split_var]))
         
@@ -49,12 +53,11 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
                     data = sub_df,
                     weights = as.vector(sub_df[,weights]))@genizi
                 
-                tb[[j+1]] <- f_topbox(formula = formula, data = sub_df, tb_limit = tb_limit)
+                tb[[j+1]] <- f_topbox(formula = formula, data = sub_df, weights = weights, tb_limit = tb_limit)
                 
                 j <- j + 1
             }
         }
-    #}
     
     # Insert result in data frame
     rwa_output <- NULL
