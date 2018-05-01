@@ -1,6 +1,6 @@
 
 library(devtools)
-install_github("henkar91/RWA/rwa", auth_token = "a67c7fa421f5b8783b136139661b7750978749bd")
+install_github("henkar91/RWA/rwa")
 
 library(rwa)
 data("exdata")
