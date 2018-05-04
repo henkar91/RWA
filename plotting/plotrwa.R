@@ -28,4 +28,4 @@ plotrwa <- function(rwa) {
 
 }
 
-rwa_to_plot(q)
+plotrwa(q)
