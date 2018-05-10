@@ -17,10 +17,10 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
     len_data <- nrow(data)
     data <- na.omit(data)
     
-    if (lenraw > nrow(data)) warning(paste("Removed", 
-                                           lenraw - nrow(data), 
+    if (len_data > nrow(data)) warning(paste("Removed", 
+                                           len_data - nrow(data), 
                                            "out of", 
-                                           lenraw, 
+                                           len_data, 
                                            "rows due to missing values"))
     
     
