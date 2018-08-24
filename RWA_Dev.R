@@ -31,7 +31,7 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
             rank = FALSE,
             rela = TRUE,
             data = data,
-            weights = as.vector(data[,weights]))@genizi
+            weights = as.vector(data[,weights]))
         
         tb[[j]] <- f_topbox(formula = formula, data = data, weights = weights, tb_limit = tb_limit)
         
@@ -48,7 +48,7 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
                     rank = FALSE,
                     rela = TRUE,
                     data = sub_df,
-                    weights = as.vector(sub_df[,weights]))@genizi
+                    weights = as.vector(sub_df[,weights]))
                 
                 tb[[j+1]] <- f_topbox(formula = formula, data = sub_df, weights = weights, tb_limit = tb_limit)
                 
@@ -59,45 +59,29 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
     # Insert result in data frame
     rwa_output <- NULL
     tb_output <- NULL
+    r2_output <- NULL
     for (k in 1:length(res)) {
-        rwa_output <- as.data.frame(cbind(rwa_output, res[[k]]))
+        rwa_output <- as.data.frame(cbind(rwa_output, res[[k]]@genizi))
+        r2_output <- c(r2_output, res[[k]]@R2)
         tb_output <- as.data.frame(cbind(tb_output, tb[[k]]))
     }
     
     colnames(rwa_output) <- append("Total", uniq)
+    names(r2_output) <- append("Total", uniq)
     colnames(tb_output) <- append("Total", uniq)
     
     return(list(rwa = rwa_output,
-                topbox = tb_output))
+                topbox = tb_output,
+                r2 = r2_output))
 }
 
-# load("rwadata.rda")
-# formula <- "dependant ~ q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8 + q9 + q10 + q11 + q12 + q13 + q14 + q15"
-
-# test total with split and weight
-total_split <- rwa(formula, data = rwadata, split_var = "splitter", weights = "weight", tb_limit = 1)
-
-# Test total without split and weight
-total <- rwa(formula, data = rwadata, weight = "weight", tb_limit = 1)
-
-
-df <- data.frame(dependant = sample(1:7, 200, replace = TRUE),
-                 q1 = sample(1:5, 200, replace = TRUE),
-                 q2 = sample(1:5, 200, replace = TRUE),
-                 q3 = sample(1:5, 200, replace = TRUE),
-                 q4 = sample(1:5, 200, replace = TRUE),
-                 q5 = sample(1:5, 200, replace = TRUE),
-                 q6 = sample(1:5, 200, replace = TRUE),
-                 q7 = sample(1:5, 200, replace = TRUE),
-                 q8 = sample(1:5, 200, replace = TRUE),
-                 q9 = sample(1:5, 200, replace = TRUE),
-                 weight = runif(n = 200, min = .5, max = 2.5),
-                 split = c(rep("SE", 50),
-                           rep("NO", 50),
-                           rep("DK", 50),
-                           rep("FI", 50)))
-
-save(df, file = "rwa/data/exdata.rda")
+load("rwa/data/exdata.rda")
 
 form <- c("dependant ~ q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8 +q9")
-total_split <- rwa(form, data = df, split_var = "split", weights = "weight", tb_limit = 4)
+
+# test total with split and weight
+total_split <- rwa(formula = form, data = df, split_var = "split", weights = "weight", tb_limit = 4)
+
+# Test total without split and weight
+total <- rwa(form, data = df, weight = "weight", tb_limit = 4)
+

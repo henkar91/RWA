@@ -24,7 +24,7 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
         rank = FALSE,
         rela = TRUE,
         data = data,
-        weights = as.vector(data[,weights]))@genizi
+        weights = as.vector(data[,weights]))
     
     tb[[j]] <- f_topbox(formula = formula, data = data, weights = weights, tb_limit = tb_limit)
     
@@ -41,7 +41,7 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
                 rank = FALSE,
                 rela = TRUE,
                 data = sub_df,
-                weights = as.vector(sub_df[,weights]))@genizi
+                weights = as.vector(sub_df[,weights]))
             
             tb[[j+1]] <- f_topbox(formula = formula, data = sub_df, weights = weights, tb_limit = tb_limit)
             
@@ -51,15 +51,19 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
     
     # Insert result in data frame
     rwa_output <- NULL
+    r2_output <- NULL
     tb_output <- NULL
     for (k in 1:length(res)) {
-        rwa_output <- as.data.frame(cbind(rwa_output, res[[k]]))
+        rwa_output <- as.data.frame(cbind(rwa_output, res[[k]]@genizi))
+        r2_output <- c(r2_output, res[[k]]@R2)
         tb_output <- as.data.frame(cbind(tb_output, tb[[k]]))
     }
     
     colnames(rwa_output) <- append("Total", uniq)
+    names(r2_output) <- append("Total", uniq)
     colnames(tb_output) <- append("Total", uniq)
     
     return(list(rwa = rwa_output,
-                topbox = tb_output))
+                topbox = tb_output,
+                r2 = r2_output))
 }
