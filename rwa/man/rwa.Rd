@@ -18,7 +18,7 @@ rwa(formula, data, split_var = FALSE, weights, tb_limit)
 \item{tb_limit}{Numeric, what is the lowest value included in top box}
 }
 \value{
-A list containing two data frames, rwa and top box
+A list containing two data frames, rwa, top box and R2
 }
 \description{
 Computes relative weight analysis and top boxes with subsets from a data frame

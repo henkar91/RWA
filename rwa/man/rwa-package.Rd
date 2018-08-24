@@ -3,10 +3,10 @@
 \alias{rwa}
 \docType{package}
 \title{
-\packageTitle{rwa}
+\packageTitle{Relative Weight Analysis}
 }
 \description{
-\packageDescription{rwa}
+\packageDescription{A function that computes several Relative Weight Analysis for total and subset of the data}
 }
 \details{
 
@@ -14,7 +14,7 @@
 \author{
 \packageAuthor{rwa}
 
-Maintainer: \packageMaintainer{rwa}
+Maintainer: \packageMaintainer{Henrik Karlsson}
 }
 \references{
 http://core.ecu.edu/psyc/wuenschk/MV/multReg/Relative_Weights_Analysis.pdf
