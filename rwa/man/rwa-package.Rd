@@ -3,7 +3,7 @@
 \alias{rwa}
 \docType{package}
 \title{
-\packageTitle{rwa}
+\packageTitle{Relative Weight Analysis}
 }
 \description{
 \packageDescription{rwa}
