@@ -6,7 +6,7 @@
 \packageTitle{rwa}
 }
 \description{
-\packageDescription{A function that computes several Relative Weight Analysis for total and subset of the data}
+\packageDescription{rwa}
 }
 \details{
 
@@ -14,7 +14,7 @@
 \author{
 \packageAuthor{rwa}
 
-Maintainer: \packageMaintainer{Henrik Karlsson}
+Maintainer: \packageMaintainer{rwa}
 }
 \references{
 http://core.ecu.edu/psyc/wuenschk/MV/multReg/Relative_Weights_Analysis.pdf
