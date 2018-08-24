@@ -12,6 +12,18 @@
 
 rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
     data <- as.data.frame(data)
+    
+    # Remove rows with NA if any, and pass warning
+    len_data <- nrow(data)
+    data <- na.omit(data)
+    
+    if (len_data > nrow(data)) warning(paste("Removed", 
+                                           len_data - nrow(data), 
+                                           "out of", 
+                                           len_data, 
+                                           "rows due to missing values"))
+    
+    
     # Store results
     res <- list()
     tb <- list()
