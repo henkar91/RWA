@@ -7,6 +7,6 @@ Author: Henrik Karlsson
 Maintainer: Henrik Karlsson <henkar91@gmail.com>
 Description: A wrapper around package relaimpo, that computes the relative weight analysis for total data frame and specified subsets of data
 License: GPL-2
-Depends: R (>= 3.0.1), relaimpo
+Depends: R (>= 3.0.1), relaimpo, ggplot2
 Imports: relaimpo, ggplot2
 RoxygenNote: 6.0.1
