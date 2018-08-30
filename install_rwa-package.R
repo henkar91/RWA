@@ -8,7 +8,11 @@ data("exdata")
 # Test with split
 res <- rwa(formula = "dependant ~ q1+q2+q3+q4+q5+q6+q7+q8+q9", data = df, split_var = "split", weights = "weight", tb_limit = 4)
 res
+
+# Plot splits
 rwa_plot(res)
+labels <- c("Ecologic", "ugly", "fashionable", "elegant", "sweet", "expensive", "childish", "luxurious", "cheap")
+rwa_plot(res, label_vec = labels)
 
 # Test without split
 rwa(formula = "dependant ~ q1+q2+q3+q4+q5+q6+q7+q8+q9", data = df, weights = "weight", tb_limit = 4)

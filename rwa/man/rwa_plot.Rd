@@ -4,10 +4,12 @@
 \alias{rwa_plot}
 \title{RWA plot}
 \usage{
-rwa_plot(rwa_object)
+rwa_plot(rwa_object, label_vec = NULL, hjust = -0.5, vjust = 0)
 }
 \arguments{
 \item{rwa_object}{list, output from function rwa()}
+
+\item{label_vec}{Vector of labels, inserted in same order as in formula}
 }
 \value{
 A list of plots
