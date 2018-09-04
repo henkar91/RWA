@@ -52,6 +52,7 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
     }
     
     cor_data <- data[,idx]
+    cor_data$weight <- NULL
     cor <- as.matrix(cor(cor_data)[,1])
     
     ###### If function for splitting ######
@@ -72,6 +73,7 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
             tb[[j+1]] <- f_topbox(formula = formula, data = sub_df, weights = weights, tb_limit = tb_limit)
             
             sub_cor_df <- sub_df[,idx]
+            sub_cor_df$weight <- NULL
             cor <- cbind(cor,as.matrix(cor(sub_cor_df)[,1]))
             j <- j + 1
         }
