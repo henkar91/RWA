@@ -40,7 +40,7 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
     tb[[j]] <- f_topbox(formula = formula, data = data, weights = weights, tb_limit = tb_limit)
     
     # Collect unique values of splitter var for sub loop
-    uniq <- as.vector(unique(data[,split_var]))
+    uniq <- as.vector(sort(unique(data[,split_var])))
     
     # Collect base number
     base <- c(nrow(data))
