@@ -19,5 +19,5 @@ f_topbox <- function(formula, data, weights, tb_limit){
     d <- apply(sub_data, 2, function(x){
         ifelse(x >= tb_limit, 1, 0) * w
     })
-    return(apply(d, 2, function(x){sum(x, na.rm = TRUE)/length(x)}))
+    return(apply(d, 2, function(x){sum(x, na.rm = TRUE)/sum(w)}))
 }
