@@ -2,6 +2,8 @@
 #' @name rwa_plot
 #' @param rwa_object list, output from function rwa()
 #' @param label_vec Vector of labels, inserted in same order as in formula
+#' @param hjust Adjust label horizontal
+#' @param vjust Adjust label vertical
 #' @return A list of plots
 #' @description Makes a scatterplot of relative weight analysis for each split
 #' @export

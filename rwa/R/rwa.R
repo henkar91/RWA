@@ -99,5 +99,6 @@ rwa <- function(formula, data, split_var = FALSE, weights, tb_limit){
                 topbox = tb_output,
                 r2 = r2_output,
                 base = base,
-                correlation = cor))
+                correlation = cor,
+                topbox_double_index = double_index(tb_output, labels_in_first_col = FALSE)))
 }

@@ -10,6 +10,10 @@ rwa_plot(rwa_object, label_vec = NULL, hjust = -0.5, vjust = 0)
 \item{rwa_object}{list, output from function rwa()}
 
 \item{label_vec}{Vector of labels, inserted in same order as in formula}
+
+\item{hjust}{Adjust label horizontal}
+
+\item{vjust}{Adjust label vertical}
 }
 \value{
 A list of plots
